@@ -13,9 +13,9 @@ Pokémon review API
 
 #### Side Notes
 - Commands
- - gitignore
-  - dotnet new gitignore
- - Migrations
-  - Add-Migration "MigrationName"
-  - Update-Database
-  - -> cmd -> dotnet run seeddata (to seed data into db)
+    - gitignore
+        - dotnet new gitignore
+    - Migrations
+        - Add-Migration "MigrationName"
+        - Update-Database
+        - -> cmd -> dotnet run seeddata (to seed data into db)
