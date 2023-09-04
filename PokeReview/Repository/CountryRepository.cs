@@ -22,22 +22,22 @@ namespace PokeReview.Repository
 
         public ICollection<Country> GetCountries()
         {
-            throw new NotImplementedException();
+            return _context.Countries.OrderBy(c =>  c.Name).ToList();
         }
 
         public Country GetCountry(int id)
         {
-            throw new NotImplementedException();
+            return _context.Countries.Where(c => c.Id == id).FirstOrDefault();
         }
 
         public Country GetCountryByOwner(int ownerId)
         {
-            throw new NotImplementedException();
+            return _context.Owners.Where(o => o.Id == ownerId).Select(c => c.Country).FirstOrDefault();
         }
 
         public ICollection<Owner> GetOwnersFromACountry(int countryId)
         {
-            throw new NotImplementedException();
+            return _context.Owners.Where(c => c.Country.Id == countryId).ToList();
         }
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PokeReview.Dto;
 using PokeReview.Interfaces;
 using PokeReview.Models;
-using PokeReview.Repository;
 
 namespace PokeReview.Controllers
 {
@@ -38,14 +37,14 @@ namespace PokeReview.Controllers
         {
             if (!_categoryRepository.CategoryExists(categoryId)) return NotFound();
 
-            var category = _mapper.Map<PokemonDto>(_categoryRepository.GetCategory(categoryId));
+            var category = _mapper.Map<CategoryDto>(_categoryRepository.GetCategory(categoryId));
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             return Ok(category);
         }
 
-        [HttpGet("pkemon/{categoryId}")]
+        [HttpGet("pokemon/{categoryId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         [ProducesResponseType(400)]
         public IActionResult GetPokemonByCategoryId(int categoryId)

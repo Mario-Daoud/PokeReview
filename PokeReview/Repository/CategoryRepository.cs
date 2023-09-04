@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PokeReview.Data;
+﻿using PokeReview.Data;
 using PokeReview.Interfaces;
 using PokeReview.Models;
 
