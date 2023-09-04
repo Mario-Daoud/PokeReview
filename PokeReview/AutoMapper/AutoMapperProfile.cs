@@ -9,6 +9,7 @@ namespace PokeReview.AutoMapper
         public AutoMapperProfile()
         {
             CreateMap<Pokemon, PokemonDto>();
+            CreateMap<Category, CategoryDto>();
         }
     }
 }
