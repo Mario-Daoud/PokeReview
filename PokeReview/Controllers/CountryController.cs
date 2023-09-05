@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PokeReview.Dto;
 using PokeReview.Interfaces;
 using PokeReview.Models;
-using PokeReview.Repository;
 
 namespace PokeReview.Controllers
 {
@@ -24,7 +23,7 @@ namespace PokeReview.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
         public IActionResult GetCountries()
         {
-            var countries= _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
+            var countries = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
