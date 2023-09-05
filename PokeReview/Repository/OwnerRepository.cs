@@ -2,6 +2,7 @@
 using PokeReview.Data;
 using PokeReview.Interfaces;
 using PokeReview.Models;
+using System.Diagnostics.Metrics;
 
 namespace PokeReview.Repository
 {
@@ -14,6 +15,12 @@ namespace PokeReview.Repository
         {
             _context = context;
             _mapper = mapper;
+        }
+
+        public bool CreateOwner(Owner owner)
+        {
+            _context.Add(owner);
+            return Save();
         }
 
         public Owner GetOwner(int ownerId)
@@ -39,6 +46,12 @@ namespace PokeReview.Repository
         public bool OwnerExists(int ownerId)
         {
             return _context.Owners.Any(o => o.Id == ownerId);
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }
