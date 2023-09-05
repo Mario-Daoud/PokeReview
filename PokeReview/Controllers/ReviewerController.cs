@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokeReview.Dto;
 using PokeReview.Interfaces;
 using PokeReview.Models;
+using PokeReview.Repository;
 
 namespace PokeReview.Controllers
 {
@@ -47,7 +48,7 @@ namespace PokeReview.Controllers
         [HttpGet("{reviewerId}/reviews")]
         [ProducesResponseType(200, Type = typeof(Reviewer))]
         [ProducesResponseType(400)]
-        public IActionResult GetReviewsByAReviewer(int reviewerId)
+        public IActionResult GetReviewsByReviewer(int reviewerId)
         {
             if (!_reviewerRepository.ReviewerExists(reviewerId)) return NotFound();
 
@@ -56,6 +57,36 @@ namespace PokeReview.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             return Ok(reviews);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateReviewer([FromBody] ReviewerDto reviewerCreate)
+        {
+            if (reviewerCreate == null) return BadRequest(ModelState);
+
+            var reviewer = _reviewerRepository.GetReviewers()
+                .Where(r => r.LastName.Trim().ToUpper() == reviewerCreate.LastName.Trim().ToUpper())
+                .FirstOrDefault();
+
+            if (reviewer != null)
+            {
+                ModelState.AddModelError("", "Reviewer already exists.");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid) return BadRequest();
+
+            var reviewerMap = _mapper.Map<Reviewer>(reviewerCreate);
+
+            if (!_reviewerRepository.CreateReviewer(reviewerMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Succesfully created.");
         }
     }
 }

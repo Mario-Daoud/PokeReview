@@ -47,7 +47,7 @@ namespace PokeReview.Controllers
         [HttpGet("pokemon/{categoryId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
         [ProducesResponseType(400)]
-        public IActionResult GetPokemonByCategoryId(int categoryId)
+        public IActionResult GetPokemonByCategory(int categoryId)
         {
             var pokemons = _mapper.Map<List<PokemonDto>>(_categoryRepository.GetPokemonByCategory(categoryId));
 

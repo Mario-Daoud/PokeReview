@@ -48,7 +48,7 @@ namespace PokeReview.Controllers
         [HttpGet("/owners/{ownerId}")]
         [ProducesResponseType(200, Type = typeof(Country))]
         [ProducesResponseType(400)]
-        public IActionResult GetCountryOfAnOwner(int ownerId)
+        public IActionResult GetCountryOfOwner(int ownerId)
         {
             var country = _mapper.Map<CountryDto>(_countryRepository.GetCountryByOwner(ownerId));
 
