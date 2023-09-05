@@ -7,6 +7,6 @@ namespace PokeReview.Interfaces
         ICollection<Category> GetCategories();
         Category GetCategory(int categoryId);
         ICollection<Pokemon> GetPokemonByCategory(int categoryId);
-        bool CategoryExists(int idcategoryId;
+        bool CategoryExists(int idcategoryId);
     }
 }
