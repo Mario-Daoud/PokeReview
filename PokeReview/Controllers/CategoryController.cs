@@ -51,7 +51,7 @@ namespace PokeReview.Controllers
         {
             var pokemons = _mapper.Map<List<PokemonDto>>(_categoryRepository.GetPokemonByCategory(categoryId));
 
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             return Ok(pokemons);
         }
@@ -72,7 +72,7 @@ namespace PokeReview.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var categoryMap = _mapper.Map<Category>(categoryCreate);
 
@@ -83,6 +83,31 @@ namespace PokeReview.Controllers
             }
 
             return Ok("Succesfully created.");
+        }
+
+        [HttpPut("{categoryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateCategory(int categoryId, [FromBody] CategoryDto updateCategory)
+        {
+            if (updateCategory == null) return BadRequest(ModelState);
+
+            if (categoryId != updateCategory.Id) return BadRequest(ModelState);
+
+            if (!_categoryRepository.CategoryExists(categoryId)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var categoryMap = _mapper.Map<Category>(updateCategory);
+
+            if (!_categoryRepository.UpdateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong updating category.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Succesfully updated.");
         }
     }
 }
