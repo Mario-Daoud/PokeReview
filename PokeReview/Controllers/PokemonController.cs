@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PokeReview.Dto;
 using PokeReview.Interfaces;
 using PokeReview.Models;
-using PokeReview.Repository;
 
 namespace PokeReview.Controllers
 {
@@ -12,11 +11,15 @@ namespace PokeReview.Controllers
     public class PokemonController : Controller
     {
         private readonly IPokemonRepository _pokemonRepository;
+        private readonly IOwnerRepository _ownerRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
-        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper)
+        public PokemonController(IPokemonRepository pokemonRepository, IOwnerRepository ownerRepository, ICategoryRepository categoryRepository, IMapper mapper)
         {
             _pokemonRepository = pokemonRepository;
+            _categoryRepository = categoryRepository;
+            _ownerRepository = ownerRepository;
             _mapper = mapper;
         }
 
@@ -50,7 +53,7 @@ namespace PokeReview.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetPokemonRating(int pokeId)
         {
-            if(!_pokemonRepository.PokemonExists(pokeId)) return NotFound();
+            if (!_pokemonRepository.PokemonExists(pokeId)) return NotFound();
 
             var rating = _pokemonRepository.GetPokemonRating(pokeId);
 
@@ -87,6 +90,31 @@ namespace PokeReview.Controllers
             }
 
             return Ok("Succesfully created.");
+        }
+
+        [HttpPut("{pokeId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdatePokemon(int pokeId, [FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] PokemonDto updatePokemon)
+        {
+            if (updatePokemon == null) return BadRequest(ModelState);
+
+            if (pokeId != updatePokemon.Id) return BadRequest(ModelState);
+
+            if (!_pokemonRepository.PokemonExists(pokeId)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var pokemonMap = _mapper.Map<Pokemon>(updatePokemon);
+
+            if (!_pokemonRepository.UpdatePokemon(ownerId, categoryId, pokemonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong updating pokemon.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Succesfully updated.");
         }
     }
 }
