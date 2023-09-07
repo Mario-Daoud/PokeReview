@@ -8,12 +8,10 @@ namespace PokeReview.Repository
     public class OwnerRepository : IOwnerRepository
     {
         private readonly DataContext _context;
-        private readonly IMapper _mapper;
 
-        public OwnerRepository(DataContext context, IMapper mapper)
+        public OwnerRepository(DataContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public bool CreateOwner(Owner owner)

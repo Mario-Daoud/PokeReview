@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PokeReview.Dto;
 using PokeReview.Interfaces;
 using PokeReview.Models;
-using PokeReview.Repository;
 
 namespace PokeReview.Controllers
 {
