@@ -58,7 +58,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult CreateCountry ([FromBody] CountryDto countryCreate)
         {
@@ -88,7 +88,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPut("{countryId}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public IActionResult UpdateCountry(int countryId, [FromBody] CountryDto updateCountry)
@@ -110,6 +110,27 @@ namespace PokeReview.Controllers
             }
 
             return Ok("Succesfully updated.");
+        }
+
+        [HttpDelete("{countryId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCountry(int countryId)
+        {
+            if (!_countryRepository.CountryExists(countryId)) return NotFound();
+
+            var countryDelete = _countryRepository.GetCountry(countryId);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!_countryRepository.DeleteCountry(countryDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting country.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Succesfully deleted");
         }
     }
 }

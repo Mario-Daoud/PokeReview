@@ -11,15 +11,13 @@ namespace PokeReview.Controllers
     public class PokemonController : Controller
     {
         private readonly IPokemonRepository _pokemonRepository;
-        private readonly IOwnerRepository _ownerRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IReviewRepository _reviewRepository;
         private readonly IMapper _mapper;
 
-        public PokemonController(IPokemonRepository pokemonRepository, IOwnerRepository ownerRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public PokemonController(IPokemonRepository pokemonRepository, IReviewRepository reviewRepository, IMapper mapper)
         {
             _pokemonRepository = pokemonRepository;
-            _categoryRepository = categoryRepository;
-            _ownerRepository = ownerRepository;
+            _reviewRepository = reviewRepository;
             _mapper = mapper;
         }
 
@@ -63,7 +61,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult CreatePokemon([FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] PokemonDto pokemonCreate)
         {
@@ -93,7 +91,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPut("{pokeId}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public IActionResult UpdatePokemon(int pokeId, [FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] PokemonDto updatePokemon)
@@ -115,6 +113,36 @@ namespace PokeReview.Controllers
             }
 
             return Ok("Succesfully updated.");
+        }
+
+        [HttpDelete("{pokeId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult DeletePokemon(int pokeId)
+        {
+            if (!_pokemonRepository.PokemonExists(pokeId)) return NotFound();
+
+            var pokemonDelete = _pokemonRepository.GetPokemon(pokeId);
+            var reviewsDelete = _reviewRepository.GetReviewsOfPokemon(pokeId);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (reviewsDelete.Count != 0) {
+                if (!_reviewRepository.DeleteReviews(reviewsDelete.ToList()))
+                {
+                    ModelState.AddModelError("", "Something went wrong deleting reviews.");
+                    return StatusCode(500, ModelState);
+                }
+            }
+
+            if (!_pokemonRepository.DeletePokemon(pokemonDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting pokemon.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Succesfully deleted.");
         }
     }
 }

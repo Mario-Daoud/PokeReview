@@ -60,7 +60,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult CreateReviewer([FromBody] ReviewerDto reviewerCreate)
         {
@@ -90,7 +90,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPut("{reviewerId}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public IActionResult UpdateReviewer(int reviewerId, [FromBody] ReviewerDto updateReviewer)
@@ -112,6 +112,30 @@ namespace PokeReview.Controllers
             }
 
             return Ok("Succesfully updated.");
+        }
+
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
+            {
+                return NotFound();
+            }
+
+            var reviewerDelete = _reviewerRepository.GetReviewer(reviewerId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.DeleteReviewer(reviewerDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting reviewer");
+            }
+
+            return Ok("Succesfully deleted.");
         }
     }
 }

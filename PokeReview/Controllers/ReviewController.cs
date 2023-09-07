@@ -54,7 +54,7 @@ namespace PokeReview.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetReviewForPokemon(int pokeId)
         {
-            var review = _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviewsOfAPokemon(pokeId));
+            var review = _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviewsOfPokemon(pokeId));
 
             if (!ModelState.IsValid) return BadRequest();
 
@@ -62,7 +62,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult CreateReview([FromQuery] int reviewerId, [FromQuery] int pokeId, [FromBody] ReviewDto reviewCreate)
         {
@@ -95,7 +95,7 @@ namespace PokeReview.Controllers
         }
 
         [HttpPut("{reviewId}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public IActionResult UpdateReview(int reviewId, [FromBody] ReviewDto updateReview)
@@ -117,6 +117,30 @@ namespace PokeReview.Controllers
             }
 
             return Ok("Succesfully updated.");
+        }
+
+        [HttpDelete("{reviewId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (!_reviewRepository.ReviewExists(reviewId))
+            {
+                return NotFound();
+            }
+
+            var reviewDelete = _reviewRepository.GetReview(reviewId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.DeleteReview(reviewDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting review");
+            }
+
+            return Ok("Succesfully deleted.");
         }
     }
 }

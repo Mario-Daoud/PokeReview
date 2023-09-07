@@ -33,7 +33,7 @@ namespace PokeReview.Repository
             return _context.Reviews.OrderBy(r => r.Id).ToList();
         }
 
-        public ICollection<Review> GetReviewsOfAPokemon(int pokeId)
+        public ICollection<Review> GetReviewsOfPokemon(int pokeId)
         {
             return _context.Reviews.Where(r => r.Pokemon.Id == pokeId).ToList();
         }
@@ -52,6 +52,18 @@ namespace PokeReview.Repository
         public bool UpdateReview(Review review)
         {
             _context.Update(review);
+            return Save();
+        }
+
+        public bool DeleteReview(Review review)
+        {
+            _context.Remove(review);
+            return Save();
+        }
+
+        public bool DeleteReviews(List<Review> reviews)
+        {
+            _context.RemoveRange(reviews);
             return Save();
         }
     }
