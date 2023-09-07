@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PokeReview.Dto;
 using PokeReview.Interfaces;
 using PokeReview.Models;
-using PokeReview.Repository;
 
 namespace PokeReview.Controllers
 {
@@ -12,11 +11,13 @@ namespace PokeReview.Controllers
     public class ReviewerController : Controller
     {
         private readonly IReviewerRepository _reviewerRepository;
+        private readonly IReviewRepository _reviewRepository;
         private readonly IMapper _mapper;
 
-        public ReviewerController(IReviewerRepository reviewerRepository, IMapper mapper)
+        public ReviewerController(IReviewerRepository reviewerRepository, IReviewRepository reviewRepository, IMapper mapper)
         {
             _reviewerRepository = reviewerRepository;
+            _reviewRepository = reviewRepository;
             _mapper = mapper;
         }
 
@@ -126,13 +127,21 @@ namespace PokeReview.Controllers
             }
 
             var reviewerDelete = _reviewerRepository.GetReviewer(reviewerId);
+            var reviewDelete = _reviewerRepository.GetReviewsByReviewer(reviewerId).ToList();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (!_reviewRepository.DeleteReviews(reviewDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting reviewer");
+                return StatusCode(500, ModelState);
+            }
+
             if (!_reviewerRepository.DeleteReviewer(reviewerDelete))
             {
                 ModelState.AddModelError("", "Something went wrong deleting reviewer");
+                return StatusCode(500, ModelState);
             }
 
             return Ok("Succesfully deleted.");
